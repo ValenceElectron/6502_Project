@@ -10,18 +10,9 @@
   RTI
 .endproc
 
-.proc reset_handler
-  SEI
-  CLD
-  LDX #00
-  STX PPUCTRL
-  STX PPUMASK
-vblankwait:
-  BIT PPUSTATUS
-  BPL vblankwait
-  JMP main
-.endproc
+.import reset_handler
 
+.export main
 .proc main
   LDX $2002
 
@@ -35,7 +26,6 @@ vblankwait:
 
   LDA #%00011110
   STA PPUMASK
-
 forever:
   JMP forever
 .endproc
@@ -43,6 +33,5 @@ forever:
 .segment "VECTORS"
 .addr nmi_handler, reset_handler, irq_handler
 
-.segment "CHARS"
+.segment "CHR"
 .res 8192
-.segment "STARTUP"
