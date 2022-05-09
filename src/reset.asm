@@ -13,4 +13,20 @@ vblankwait:
   BIT PPUSTATUS
   BPL vblankwait
   JMP main
+
+  LDX #$00
+  LDA #$ff
+clear_oam:
+  STA $0200,X   ; set sprite y-positions off screen
+  INX
+  INX
+  INX
+  INX
+  BNE clear_oam
+
+vblankwait2:
+  BIT PPUSTATUS
+  BPL vblankwait2
+  JMP main
+  
 .endproc
