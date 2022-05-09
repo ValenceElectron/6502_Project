@@ -1,12 +1,5 @@
-; This segment is placed at the very beginning of the .nes file.
-.segment "HEADER"
-; This line inserts 8 data bytes into the output, instead of interpreting opcodes
-; from them. $4e, $45, and $53 are the ASCII representations of N, E, and S, with
-; $1a being the MS-DOS 'end-of-file' character. These four bytes are the secret
-; password that marks the output as an NES game.
-.byte $4e, $45, $53, $1a, $02, $01, $00, $00
-; The next parts specify that our game contains two 16kb PRG-ROM banks (32kb storage)
-; one 8kb CHR-ROM bank, and that that it uses 'mapper zero'.
+.include "constants.inc"
+.include "header.inc"
 
 ; .proc allows us to create new lexical scopes. A label 'some_label' in .proc foo
 ; is not the same as 'some_label' in .proc bar. You can only access foo's some_label
@@ -36,11 +29,11 @@
   ; 6502.
   CLD
   LDX #00
-  STX $2000 ; PPUCTRL, much more complicated than PPUMASK, will be covered later.
-  STX $2001 ; PPUMASK, which is covered later in main
+  STX PPUCTRL ; PPUCTRL, much more complicated than PPUMASK, will be covered later.
+  STX PPUMASK ; PPUMASK, which is covered later in main
 vblankwait:
   ; vblankwait waits for the PPU to fully boot up before moving to our main code.
-  BIT $2002
+  BIT PPUSTATUS
   BPL vblankwait
   JMP main
 .endproc
@@ -57,9 +50,9 @@ vblankwait:
   ; palettes of 4 colors each, 4 foreground and 4 background. The first color
   ; of each palette would be treated as the transparent/background color.
   LDX #$3f
-  STX $2006
+  STX PPUADDR
   LDX #$00
-  STX $2006
+  STX PPUADDR
 
   ; $2006 lets you store the PPU memory you want to address, $2007 is the value
   ; you want to set at said address. $2006 requires two stores, the high (left)
@@ -68,13 +61,13 @@ vblankwait:
   ; first color of the first palette, which sets the background color to color 28
   ; out of the 64 colors the NES can display.
   LDA #$28
-  STA $2007
+  STA PPUDATA
 
   ; $2001 is also known as PPUMASK, and this is a set of 8 bit flags, to tell the PPU
   ; to display things to the screen. Each bit in the byte acts as an on/off switch
   ; for a particular property. For the documentation, visit: https://famicom.party/book/05-6502assembly/
   LDA #%00011110
-  STA $2001
+  STA PPUMASK
 
   ; this next part sets the program to loop infinitely. If this wasn't the case,
   ; it would try to move on in memory and start accessing random elements, which
