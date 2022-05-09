@@ -27,24 +27,21 @@
   STX PPUADDR
 
   ; Actually select the palettes
-  LDA #$29
+load_palettes:
+  LDA palettes,X
   STA PPUDATA
-  LDA #$19
-  STA PPUDATA
-  LDA #$09
-  STA PPUDATA
-  LDA #$0f
-  STA PPUDATA
+  INX
+  CPX #$0f
+  BNE load_palettes
 
   ; Write the sprite data
-  LDA #$70
-  STA $0200   ; Y-coord of first sprite
-  LDA #$05
-  STA $0201   ; tile number of first sprite
-  LDA #$00
-  STA $0202   ; attributes of first sprite
-  LDA #$80
-  STA $0203   ; X-coord of first sprite
+  LDX #$00
+load_sprites:
+  LDA sprites,X
+  STA $0200,X
+  INX
+  CPX #$0f
+  BNE load_sprites
 
 vblankwait:       ; wait for another vblank before continuing
   BIT PPUSTATUS
@@ -54,10 +51,16 @@ vblankwait:       ; wait for another vblank before continuing
   STA PPUCTRL
   LDA #%00011110  ; turn on screen
   STA PPUMASK
-  
+
 forever:
   JMP forever
 .endproc
+
+.segment "RODATA"
+palettes:
+.byte $0d, $21, $11, $01, $0d, $26, $16, $0d, $09, $24, $14, $04, $0d, $29, $19, $09
+sprites:
+.byte $70, $05, $00, $80, $70, $06, $00, $88, $78, $07, $00, $80, $78, $08, $00, $88
 
 .segment "VECTORS"
 .addr nmi_handler, reset_handler, irq_handler
