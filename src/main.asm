@@ -21,7 +21,7 @@
   LDX #$00
   STX PPUADDR
 
-  LDA #$28
+  LDA #$24
   STA PPUDATA
 
   LDA #%00011110
