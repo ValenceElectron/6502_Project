@@ -159,6 +159,15 @@ nametable:
 	STA PPUADDR
 	STX PPUDATA
 
+  ; the tile i created now:
+  LDA PPUSTATUS
+  LDA #$23
+  STA PPUADDR
+  LDA #$44
+  STA PPUADDR
+  LDX #$30
+  STX PPUDATA
+
 	; finally, attribute table
 	LDA PPUSTATUS
 	LDA #$23
@@ -175,6 +184,17 @@ nametable:
 	STA PPUADDR
 	LDA #%00001100
 	STA PPUDATA
+
+  ; attribute table for my tile
+  LDA PPUSTATUS
+  LDA #$23
+  STA PPUADDR
+  LDA #$f1
+  STA PPUADDR
+  LDA #%01100000
+  STA PPUDATA
+  ; Important note on setting the attribute tables, the rightmost 2 bits are for choosing 1 of the 4 background palettes for the top right,
+  ; the next two bits are for top left, the next for bottom left, and finally the left-most 2 bits for the bottom right.
 
 vblankwait:       ; wait for another vblank before continuing
   BIT PPUSTATUS
